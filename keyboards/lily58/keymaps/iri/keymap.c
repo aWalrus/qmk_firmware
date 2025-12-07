@@ -16,21 +16,21 @@ enum layer_number {
 					KC_TAB, KC_Q, KC_W, KC_E, KC_R, KC_T, 								KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSLS,
 					KC_LCTL, KC_A, KC_S, KC_D, KC_F, KC_G,	 							KC_H, KC_J, KC_K, KC_L, KC_SCLN, KC_QUOT, 
 					KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_BSPC, 			KC_DEL, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, 
-								   KC_LALT, KC_LGUI, MO(1), KC_SPC,		 		KC_ENT, MO(2), KC_RCTL, KC_RALT),
+								   KC_LALT, KC_LGUI, TL_LOWR, KC_SPC,		 		KC_ENT, TL_UPPR, KC_RCTL, KC_RALT),
 
 [_LOWER] = LAYOUT(
 					KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, 							KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12, 
 					KC_TRNS, KC_TRNS, KC_UP, KC_TRNS, KC_TRNS, KC_TRNS, 				KC_TRNS, KC_TRNS, KC_UP, KC_TRNS, KC_TRNS, KC_TRNS, 
 					KC_TRNS, KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_TRNS, 				KC_TRNS, KC_LEFT, KC_DOWN, KC_RGHT, KC_TRNS, KC_TRNS, 
 					KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_DEL, 	KC_BSPC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
-											  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 	KC_TRNS, MO(3), KC_TRNS, KC_TRNS),
+											  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 	KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
 [_RAISE] = LAYOUT(
 					KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 				KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
 					KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MINS, KC_GRV, 				KC_PGUP, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, 
 					KC_TRNS, KC_TRNS, KC_LCBR, KC_RCBR, KC_INS, KC_PSCR, 				KC_PGDN, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
 					KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_HOME, KC_END, KC_DEL, 	KC_BSPC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-											    KC_TRNS, KC_TRNS, MO(3), KC_TRNS, 	KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+											    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
 [_ADJUST] = LAYOUT(
 					KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, 							KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, 
@@ -42,9 +42,6 @@ enum layer_number {
 };
 
 
-layer_state_t layer_state_set_user(layer_state_t state) {
-  return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
-}
 //SSD1306 OLED update loop, make sure to enable OLED_ENABLE=yes in rules.mk
 #ifdef OLED_ENABLE
 
@@ -83,6 +80,25 @@ bool oled_task_user(void) {
 #endif // OLED_ENABLE
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  
+  switch (keycode) {
+    case _LOWER:
+      if (record->event.pressed) {
+        layer_on(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      }
+      return false;
+    case _RAISE:
+      if (record->event.pressed) {
+        layer_on(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      }
+      return false;
+    }
   return true;
 }
